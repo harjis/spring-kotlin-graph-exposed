@@ -1,6 +1,7 @@
 package com.example.springkotlingraphexposed
 
 import com.example.springkotlingraphexposed.app.entities.Graphs
+import com.example.springkotlingraphexposed.app.entities.Nodes
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
@@ -21,7 +22,7 @@ fun main(args: Array<String>) {
     )
     transaction {
         addLogger(StdOutSqlLogger)
-        SchemaUtils.create(Graphs)
+        SchemaUtils.create(Graphs, Nodes)
     }
 
     runApplication<SpringKotlinGraphExposedApplication>(*args)
