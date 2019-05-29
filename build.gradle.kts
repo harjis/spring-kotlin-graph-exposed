@@ -13,6 +13,9 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
 	mavenCentral()
+    maven {
+        url = uri("https://dl.bintray.com/kotlin/exposed")
+    }
 }
 
 dependencies {
@@ -23,7 +26,7 @@ dependencies {
 	runtimeOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	compile("org.jetbrains.exposed:exposed:0.13.7")
+	implementation("org.jetbrains.exposed:exposed:0.13.7")
 }
 
 tasks.withType<KotlinCompile> {
