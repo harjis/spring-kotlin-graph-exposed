@@ -1,7 +1,7 @@
 package com.example.springkotlingraphexposed
 
-import com.example.springkotlingraphexposed.app.entities.Graphs
-import com.example.springkotlingraphexposed.app.entities.Nodes
+import com.example.springkotlingraphexposed.app.tables.Graphs
+import com.example.springkotlingraphexposed.app.tables.Nodes
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger

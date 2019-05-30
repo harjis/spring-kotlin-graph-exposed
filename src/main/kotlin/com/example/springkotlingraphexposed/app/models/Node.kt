@@ -1,6 +1,6 @@
 package com.example.springkotlingraphexposed.app.models
 
-import com.example.springkotlingraphexposed.app.entities.Nodes
+import com.example.springkotlingraphexposed.app.tables.Nodes
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
