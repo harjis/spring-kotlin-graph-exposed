@@ -1,5 +1,6 @@
 package com.example.springkotlingraphexposed.db
 
+import com.example.springkotlingraphexposed.app.models.Edge
 import com.example.springkotlingraphexposed.app.models.Graph
 import com.example.springkotlingraphexposed.app.models.Node
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,10 +19,24 @@ class Seeds {
             }
         }
 
-        transaction {
+        val node = transaction {
             Node.new {
                 name = "Node 1"
                 graph = graph1
+            }
+        }
+
+        val node2 = transaction {
+            Node.new {
+                name = "Node 2"
+                graph = graph1
+            }
+        }
+
+        transaction {
+            Edge.new {
+                fromNode = node
+                toNode = node2
             }
         }
     }
