@@ -8,6 +8,5 @@ class SpringKotlinGraphExposedApplicationTests {
 
     @Test
     fun contextLoads() {
-        println("context loads")
     }
 }

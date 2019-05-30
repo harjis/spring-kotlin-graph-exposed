@@ -3,6 +3,7 @@ package com.example.springkotlingraphexposed.app.services.graphs
 import com.example.springkotlingraphexposed.app.models.Graph
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.stereotype.Service
+import java.lang.Exception
 
 @Service
 class GraphSaveService {
@@ -23,9 +24,11 @@ class GraphSaveService {
     }
 
     private fun update(params: GraphParams): Graph {
-        return Graph.new {
-            name = params.name
-        }
+        if (params.id == null) throw Exception("No update without id")
+        var graph = Graph.findById(params.id)
+        if (graph == null) throw Exception("No graph found with id: ")
+        graph.name = params.name
+        return graph
     }
 }
 
