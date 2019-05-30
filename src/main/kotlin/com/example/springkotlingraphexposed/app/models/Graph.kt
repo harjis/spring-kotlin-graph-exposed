@@ -12,3 +12,9 @@ class Graph(id: EntityID<Int>) : IntEntity(id) {
     var name by Graphs.name
     val nodes by Node referrersOn Nodes.graph
 }
+
+data class GraphResponse(val name: String)
+
+fun Graph.render() = GraphResponse(
+        name = this.name
+)
