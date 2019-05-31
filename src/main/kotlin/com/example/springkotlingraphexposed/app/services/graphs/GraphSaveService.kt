@@ -63,8 +63,8 @@ class GraphSaveService {
 
     private fun deleteNodes(nodes: List<NodeParams>, savedGraph: Graph) {
         val persistedNodeIds: List<Int> = savedGraph.nodes.map { it.id.value }
-        val parmamsNodeIds: List<Int> = nodes.map { it.id }.filterNotNull()
-        val toBeDeleted: List<Int> = persistedNodeIds.minus(parmamsNodeIds)
+        val paramsNodeIds: List<Int> = nodes.map { it.id }.filterNotNull()
+        val toBeDeleted: List<Int> = persistedNodeIds.minus(paramsNodeIds)
         savedGraph.nodes.forEach {
             if (toBeDeleted.contains(it.id.value)) it.delete()
         }
