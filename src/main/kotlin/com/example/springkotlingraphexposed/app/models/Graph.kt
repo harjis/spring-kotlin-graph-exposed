@@ -13,6 +13,14 @@ class Graph(id: EntityID<Int>) : IntEntity(id) {
 
     var name by Graphs.name
     val nodes by Node referrersOn Nodes.graph
+
+    fun nodeById(nodeId: Int): Node? {
+        return this.nodes.find { it.id.value == nodeId }
+    }
+
+    fun uniqueEdges(): List<Edge> {
+        return this.nodes.flatMap { it.fromEdges.union(it.toEdges) }.distinctBy { it.id }
+    }
 }
 
 fun Graph.render() = GraphView(

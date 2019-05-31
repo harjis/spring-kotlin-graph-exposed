@@ -2,6 +2,7 @@ package com.example.springkotlingraphexposed.services.graphs
 
 import com.example.springkotlingraphexposed.WithTestDatabase
 import com.example.springkotlingraphexposed.app.models.Graph
+import com.example.springkotlingraphexposed.app.services.graphs.EdgeParams
 import com.example.springkotlingraphexposed.app.services.graphs.GraphParams
 import com.example.springkotlingraphexposed.app.services.graphs.GraphSaveService
 import com.example.springkotlingraphexposed.app.services.graphs.NodeParams
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test
 
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import java.util.*
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -45,7 +47,7 @@ class GraphSaveServiceTest : WithTestDatabase() {
             val params = GraphParams(
                     name = "Graph 1",
                     nodes = listOf(
-                            NodeParams(name = "Node 1")
+                            NodeParams(name = "Node 1", clientId = UUID.randomUUID())
                     )
             )
             val saved = graphSaveService.save(params)
@@ -59,7 +61,7 @@ class GraphSaveServiceTest : WithTestDatabase() {
             val params = GraphParams(
                     name = "Graph 1",
                     nodes = listOf(
-                            NodeParams(name = "Node 1")
+                            NodeParams(name = "Node 1", clientId = UUID.randomUUID())
                     )
             )
             val saved = graphSaveService.save(params)
@@ -67,7 +69,11 @@ class GraphSaveServiceTest : WithTestDatabase() {
                     id = saved.id.value,
                     name = saved.name,
                     nodes = listOf(
-                            NodeParams(id = saved.nodes.first().id.value, name = "Updated Node 1")
+                            NodeParams(
+                                    id = saved.nodes.first().id.value,
+                                    name = "Updated Node 1",
+                                    clientId = UUID.randomUUID()
+                            )
                     )
             )
             val updated = graphSaveService.save(updateParams)
@@ -82,8 +88,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
             val params = GraphParams(
                     name = "Graph 1",
                     nodes = listOf(
-                            NodeParams(name = "Node 1"),
-                            NodeParams(name = "Node 2")
+                            NodeParams(name = "Node 1", clientId = UUID.randomUUID()),
+                            NodeParams(name = "Node 2", clientId = UUID.randomUUID())
                     )
             )
             val saved = graphSaveService.save(params)
@@ -93,13 +99,34 @@ class GraphSaveServiceTest : WithTestDatabase() {
                     nodes = listOf(
                             NodeParams(
                                     id = saved.nodes.first().id.value,
-                                    name = saved.nodes.first().name
+                                    name = saved.nodes.first().name,
+                                    clientId = UUID.randomUUID()
                             )
                     )
             )
             val updated = graphSaveService.save(updateParams)
             assertThat(updated.nodes.count()).isEqualTo(1)
             assertThat(updated.nodes.first().name).isEqualTo("Node 1")
+        }
+    }
+
+    @Test
+    fun canCreateEdges() {
+        withDb {
+            val nodeId = UUID.randomUUID()
+            val nodeId2 = UUID.randomUUID()
+            val params = GraphParams(
+                    name = "Graph 1",
+                    nodes = listOf(
+                            NodeParams(name = "Node 1", clientId = nodeId),
+                            NodeParams(name = "Node 2", clientId = nodeId2)
+                    ),
+                    edges = listOf(
+                            EdgeParams(fromNode = nodeId, toNode = nodeId2)
+                    )
+            )
+            val saved = graphSaveService.save(params)
+            assertThat(saved.uniqueEdges().count()).isEqualTo(1)
         }
     }
 }
