@@ -31,7 +31,6 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-api")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 	implementation("org.jetbrains.exposed:exposed:0.13.7")
-
 }
 
 tasks.withType<KotlinCompile> {
