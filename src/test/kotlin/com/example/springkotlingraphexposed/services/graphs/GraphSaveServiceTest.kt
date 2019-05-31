@@ -75,4 +75,31 @@ class GraphSaveServiceTest : WithTestDatabase() {
             assertThat(updated.nodes.first().name).isEqualTo("Updated Node 1")
         }
     }
+
+    @Test
+    fun canDeleteNodes() {
+        withDb {
+            val params = GraphParams(
+                    name = "Graph 1",
+                    nodes = listOf(
+                            NodeParams(name = "Node 1"),
+                            NodeParams(name = "Node 2")
+                    )
+            )
+            val saved = graphSaveService.save(params)
+            val updateParams = GraphParams(
+                    id = saved.id.value,
+                    name = saved.name,
+                    nodes = listOf(
+                            NodeParams(
+                                    id = saved.nodes.first().id.value,
+                                    name = saved.nodes.first().name
+                            )
+                    )
+            )
+            val updated = graphSaveService.save(updateParams)
+            assertThat(updated.nodes.count()).isEqualTo(1)
+            assertThat(updated.nodes.first().name).isEqualTo("Node 1")
+        }
+    }
 }

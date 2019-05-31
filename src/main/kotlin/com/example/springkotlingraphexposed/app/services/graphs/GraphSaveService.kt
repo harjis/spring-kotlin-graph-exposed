@@ -33,6 +33,7 @@ class GraphSaveService {
         if (graph == null) throw Exception("No graph found with id: ")
         graph.name = params.name
         upsertNodes(params.nodes, graph)
+        deleteNodes(params.nodes, graph)
         return graph
     }
 
@@ -49,6 +50,15 @@ class GraphSaveService {
                     node.name = it.name
                 }
             }
+        }
+    }
+
+    private fun deleteNodes(nodes: List<NodeParams>, savedGraph: Graph){
+        val persistedNodeIds: List<Int> = savedGraph.nodes.map { it.id.value }
+        val parmamsNodeIds: List<Int> = nodes.map { it.id }.filterNotNull()
+        val toBeDeleted: List<Int> = persistedNodeIds.minus(parmamsNodeIds)
+        savedGraph.nodes.forEach {
+            if(toBeDeleted.contains(it.id.value)) it.delete()
         }
     }
 }
