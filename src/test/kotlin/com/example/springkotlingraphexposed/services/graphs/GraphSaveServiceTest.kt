@@ -129,4 +129,53 @@ class GraphSaveServiceTest : WithTestDatabase() {
             assertThat(saved.uniqueEdges().count()).isEqualTo(1)
         }
     }
+
+    @Test
+    fun canCreateMoreEdges() {
+        withDb {
+            val nodeId = UUID.randomUUID()
+            val nodeId2 = UUID.randomUUID()
+            val params = GraphParams(
+                    name = "Graph 1",
+                    nodes = listOf(
+                            NodeParams(name = "Node 1", clientId = nodeId),
+                            NodeParams(name = "Node 2", clientId = nodeId2)
+                    ),
+                    edges = listOf(
+                            EdgeParams(fromNode = nodeId, toNode = nodeId2)
+                    )
+            )
+            val saved = graphSaveService.save(params)
+            val updateParams = GraphParams(
+                    id = saved.id.value,
+                    name = "Graph 1",
+                    nodes = listOf(
+                            NodeParams(
+                                    id = saved.nodes.first().id.value,
+                                    name = "Node 1",
+                                    clientId = nodeId
+                            ),
+                            NodeParams(
+                                    id = saved.nodes.last().id.value,
+                                    name = "Node 2",
+                                    clientId = nodeId2
+                            )
+                    ),
+                    edges = listOf(
+                            EdgeParams(
+                                    id = saved.uniqueEdges().first().id.value,
+                                    fromNode = saved.nodes.first().id.value,
+                                    toNode = saved.nodes.last().id.value
+                            ),
+                            EdgeParams(
+                                    fromNode = saved.nodes.first().id.value,
+                                    toNode = saved.nodes.last().id.value
+                            )
+                    )
+            )
+            val updated = graphSaveService.save(updateParams)
+            // TODO once unique constraint is added this should fail
+            assertThat(updated.uniqueEdges().count()).isEqualTo(2)
+        }
+    }
 }
