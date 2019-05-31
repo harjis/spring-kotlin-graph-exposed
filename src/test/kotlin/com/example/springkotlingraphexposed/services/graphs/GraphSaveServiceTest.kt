@@ -131,6 +131,7 @@ class GraphSaveServiceTest : WithTestDatabase() {
     }
 
     @Test
+    // TODO try out if this fails with hibernate. It should
     fun canCreateMoreEdges() {
         withDb {
             val nodeId = UUID.randomUUID()
@@ -176,6 +177,43 @@ class GraphSaveServiceTest : WithTestDatabase() {
             val updated = graphSaveService.save(updateParams)
             // TODO once unique constraint is added this should fail
             assertThat(updated.uniqueEdges().count()).isEqualTo(2)
+        }
+    }
+
+    @Test
+    fun canDeleteEdge() {
+        withDb {
+            val nodeId = UUID.randomUUID()
+            val nodeId2 = UUID.randomUUID()
+            val params = GraphParams(
+                    name = "Graph 1",
+                    nodes = listOf(
+                            NodeParams(name = "Node 1", clientId = nodeId),
+                            NodeParams(name = "Node 2", clientId = nodeId2)
+                    ),
+                    edges = listOf(
+                            EdgeParams(fromNode = nodeId, toNode = nodeId2)
+                    )
+            )
+            val saved = graphSaveService.save(params)
+            val updateParams = GraphParams(
+                    id = saved.id.value,
+                    name = "Graph 1",
+                    nodes = listOf(
+                            NodeParams(
+                                    id = saved.nodes.first().id.value,
+                                    name = "Node 1",
+                                    clientId = nodeId
+                            ),
+                            NodeParams(
+                                    id = saved.nodes.last().id.value,
+                                    name = "Node 2",
+                                    clientId = nodeId2
+                            )
+                    )
+            )
+            val updated = graphSaveService.save(updateParams)
+            assertThat(updated.uniqueEdges().count()).isEqualTo(0)
         }
     }
 }

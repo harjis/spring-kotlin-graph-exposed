@@ -25,8 +25,7 @@ class GraphSaveService {
             name = params.name
         }
         upsertNodes(params.nodes, savedGraph)
-        val nodeMap = getNodeMap(params.nodes, savedGraph)
-        saveEdges(params.edges, savedGraph, nodeMap)
+        saveEdges(params.edges, savedGraph, getNodeMap(params.nodes, savedGraph))
 
         return savedGraph
     }
@@ -39,8 +38,10 @@ class GraphSaveService {
         graph.name = params.name
         upsertNodes(params.nodes, graph)
         deleteNodes(params.nodes, graph)
-        val nodeMap = getNodeMap(params.nodes, graph)
-        saveEdges(params.edges, graph, nodeMap)
+        deleteEdges(params.edges, graph)
+        saveEdges(params.edges, graph, getNodeMap(params.nodes, graph))
+
+
         return graph
     }
 
@@ -97,6 +98,16 @@ class GraphSaveService {
                     fromNode = _fromNode
                     toNode = _toNode
                 }
+            }
+        }
+    }
+
+    private fun deleteEdges(edges: List<EdgeParams>, graph: Graph) {
+        graph.uniqueEdges().forEach {
+            println(it.id.toString() + " " + it.fromNode.id + " " + it.toNode.id)
+            val inParams = edges.find { edgeParams -> edgeParams.id == it.id.value }
+            if (inParams == null) {
+                it.delete()
             }
         }
     }
