@@ -1,6 +1,7 @@
 package com.example.springkotlingraphexposed.app.services.graphs
 
 import com.example.springkotlingraphexposed.app.models.Graph
+import com.example.springkotlingraphexposed.app.models.Node
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.stereotype.Service
 import java.lang.Exception
@@ -18,9 +19,12 @@ class GraphSaveService {
     }
 
     private fun create(params: GraphParams): Graph {
-        return Graph.new {
+        val savedGraph = Graph.new {
             name = params.name
         }
+        upsertNodes(params.nodes, savedGraph)
+
+        return savedGraph
     }
 
     private fun update(params: GraphParams): Graph {
@@ -28,8 +32,26 @@ class GraphSaveService {
         var graph = Graph.findById(params.id)
         if (graph == null) throw Exception("No graph found with id: ")
         graph.name = params.name
+        upsertNodes(params.nodes, graph)
         return graph
+    }
+
+    private fun upsertNodes(nodes: List<NodeParams>, savedGraph: Graph) {
+        nodes.forEach {
+            if(it.id == null) {
+                Node.new {
+                    name = it.name
+                    graph = savedGraph
+                }
+            } else {
+                val node = savedGraph.nodes.find { node -> node.id.value == it.id }
+                if (node is Node) {
+                    node.name = it.name
+                }
+            }
+        }
     }
 }
 
-data class GraphParams(val id: Int? = null, val name: String)
+data class GraphParams(val id: Int? = null, val name: String, val nodes: List<NodeParams> = listOf())
+data class NodeParams(val id: Int? = null, val name: String)
