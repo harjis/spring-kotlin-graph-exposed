@@ -25,7 +25,9 @@ class GraphSaveService {
             name = params.name
         }
         upsertNodes(params.nodes, savedGraph)
-        saveEdges(params.edges, savedGraph, getNodeMap(params.nodes, savedGraph))
+        // nodeMap needs to be calculated exactly at this position
+        val nodeMap = getNodeMap(params.nodes, savedGraph)
+        saveEdges(params.edges, savedGraph, nodeMap)
 
         return savedGraph
     }
@@ -37,9 +39,11 @@ class GraphSaveService {
 
         graph.name = params.name
         upsertNodes(params.nodes, graph)
+        // nodeMap needs to be calculated exactly at this position
+        val nodeMap = getNodeMap(params.nodes, graph)
         deleteNodes(params.nodes, graph)
         deleteEdges(params.edges, graph)
-        saveEdges(params.edges, graph, getNodeMap(params.nodes, graph))
+        saveEdges(params.edges, graph, nodeMap)
 
 
         return graph
@@ -47,7 +51,7 @@ class GraphSaveService {
 
     private fun upsertNodes(nodes: List<NodeParams>, savedGraph: Graph) {
         nodes.forEach {
-            if (it.id == null) {
+            val node = if (it.id == null) {
                 Node.new {
                     name = it.name
                     graph = savedGraph
@@ -57,7 +61,10 @@ class GraphSaveService {
                 if (node is Node) {
                     node.name = it.name
                 }
+                node
             }
+            // NodeParams need to be updated so that primary key's are in sync.
+            it.id = node!!.id.value
         }
     }
 
@@ -126,5 +133,5 @@ data class GraphParams(
         val edges: List<EdgeParams> = listOf()
 )
 
-data class NodeParams(val id: Int? = null, val name: String, val clientId: UUID)
+data class NodeParams(var id: Int? = null, val name: String, val clientId: UUID)
 data class EdgeParams(val id: Int? = null, val fromNode: Any?, val toNode: Any?)

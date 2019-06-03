@@ -7,12 +7,18 @@ import com.example.springkotlingraphexposed.app.views.nodes.NodeView
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.sql.SizedIterable
+import org.jetbrains.exposed.sql.SortOrder
 
 class Graph(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<Graph>(Graphs)
 
     var name by Graphs.name
     val nodes by Node referrersOn Nodes.graph
+
+    fun nodesByInsertOrder(): SizedIterable<Node> {
+        return this.nodes.orderBy(Nodes.id to SortOrder.ASC)
+    }
 
     fun nodeById(nodeId: Int): Node? {
         return this.nodes.find { it.id.value == nodeId }

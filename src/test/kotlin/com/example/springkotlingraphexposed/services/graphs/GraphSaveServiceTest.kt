@@ -7,6 +7,7 @@ import com.example.springkotlingraphexposed.app.services.graphs.GraphParams
 import com.example.springkotlingraphexposed.app.services.graphs.GraphSaveService
 import com.example.springkotlingraphexposed.app.services.graphs.NodeParams
 import org.assertj.core.api.Assertions.assertThat
+import org.jetbrains.exposed.sql.SizedIterable
 import org.junit.jupiter.api.Test
 
 import org.springframework.boot.test.context.SpringBootTest
@@ -107,6 +108,39 @@ class GraphSaveServiceTest : WithTestDatabase() {
             val updated = graphSaveService.save(updateParams)
             assertThat(updated.nodes.count()).isEqualTo(1)
             assertThat(updated.nodes.first().name).isEqualTo("Node 1")
+        }
+    }
+
+    @Test
+    fun canAddAndUpdateNodes() {
+        withDb {
+            val params = GraphParams(
+                    name = "Graph1",
+                    nodes = listOf(
+                            NodeParams(
+                                    name = "Node 1", clientId = UUID.randomUUID()
+                            ),
+                            NodeParams(name = "Node 2", clientId = UUID.randomUUID())
+                    )
+            )
+            val saved = graphSaveService.save(params)
+            val updatedParams = GraphParams(
+                    id = saved.id.value,
+                    name = "Updated " + saved.name,
+                    nodes = saved.nodes.mapIndexed { index, node ->
+                        NodeParams(
+                                id = node.id.value,
+                                name = "Updated " + node.name,
+                                clientId = params.nodes[index].clientId
+                        )
+                    }.plus(NodeParams(name = "New Node 3", clientId = UUID.randomUUID()))
+            )
+            val updated = graphSaveService.save(updatedParams)
+            assertThat(updated.name).isEqualTo("Updated Graph1")
+            assertThat(updated.nodes.count()).isEqualTo(3)
+            assertThat(updated.nodesByInsertOrder().first().name).isEqualTo("Updated Node 1")
+            assertThat(updated.nodesByInsertOrder().elementAt(1).name).isEqualTo("Updated Node 2")
+            assertThat(updated.nodesByInsertOrder().last().name).isEqualTo("New Node 3")
         }
     }
 
