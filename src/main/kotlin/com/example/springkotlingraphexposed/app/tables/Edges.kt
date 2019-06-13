@@ -5,4 +5,7 @@ import org.jetbrains.exposed.dao.IntIdTable
 object Edges : IntIdTable() {
     val fromNode = reference("from_node", Nodes)
     val toNode = reference("to_node", Nodes)
+    init {
+        index(true, fromNode, toNode)
+    }
 }
