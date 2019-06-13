@@ -3,6 +3,7 @@ package com.example.springkotlingraphexposed.app.services.graphs
 import com.example.springkotlingraphexposed.app.models.Edge
 import com.example.springkotlingraphexposed.app.models.Graph
 import com.example.springkotlingraphexposed.app.models.Node
+import com.example.springkotlingraphexposed.app.models.SomeOtherJson
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.stereotype.Service
 import java.lang.Exception
@@ -54,6 +55,7 @@ class GraphSaveService {
                 Node.new {
                     name = it.name
                     graph = savedGraph
+                    content = SomeOtherJson()
                 }
             } else {
                 val node = savedGraph.nodes.find { node -> node.id.value == it.id }
