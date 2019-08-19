@@ -2,6 +2,7 @@ package com.example.springkotlingraphexposed.app.models
 
 import com.example.springkotlingraphexposed.app.tables.Edges
 import com.example.springkotlingraphexposed.app.tables.Nodes
+import com.example.springkotlingraphexposed.app.views.nodes.NodeView
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -35,4 +36,16 @@ class Node(id: EntityID<Int>) : IntEntity(id) {
     var graph by Graph referencedOn Nodes.graph
     val fromEdges by Edge referrersOn Edges.fromNode
     val toEdges by Edge referrersOn Edges.toNode
+
+    fun toEdgeIds(): List<Int> {
+        return toEdges.map { it.id.value }
+    }
 }
+
+fun Node.render() = NodeView(
+        content = this.content,
+        graph_id = this.graph.id.value,
+        id = this.id.value,
+        name = this.name,
+        to_edge_ids = this.toEdgeIds()
+)

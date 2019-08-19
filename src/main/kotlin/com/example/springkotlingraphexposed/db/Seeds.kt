@@ -14,33 +14,33 @@ import org.springframework.context.annotation.Profile
 class Seeds {
     @Bean
     fun initDatabase() {
-        val graph1 = transaction {
-            Graph.new {
-                name = "Graph 1"
-            }
-        }
-
-        val node = transaction {
-            Node.new {
-                name = "Node 1"
-                graph = graph1
-                content = SomeOtherJson()
-            }
-        }
-
-        val node2 = transaction {
-            Node.new {
-                name = "Node 2"
-                graph = graph1
-                content = SomeOtherJson()
-            }
-        }
-
-        transaction {
-            Edge.new {
-                fromNode = node
-                toNode = node2
-            }
-        }
+//        val graph1 = transaction {
+//            Graph.new {
+//                name = "Graph 1"
+//            }
+//        }
+//
+//        val node = transaction {
+//            Node.new {
+//                name = "Node 1"
+//                graph = graph1
+//                content = SomeOtherJson()
+//            }
+//        }
+//
+//        val node2 = transaction {
+//            Node.new {
+//                name = "Node 2"
+//                graph = graph1
+//                content = SomeOtherJson()
+//            }
+//        }
+//
+//        transaction {
+//            Edge.new {
+//                fromNode = node
+//                toNode = node2
+//            }
+//        }
     }
 }

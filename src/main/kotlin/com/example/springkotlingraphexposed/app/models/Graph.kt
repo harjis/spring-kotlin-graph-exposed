@@ -23,6 +23,10 @@ class Graph(id: EntityID<Int>) : IntEntity(id) {
         return this.nodes.find { it.id.value == nodeId }
     }
 
+    fun edgeById(edgeId: Int): Edge? {
+        return uniqueEdges().find { it.id.value == edgeId }
+    }
+
     fun uniqueEdges(): List<Edge> {
         return this.nodes.flatMap { it.fromEdges.union(it.toEdges) }.distinctBy { it.id }
     }
