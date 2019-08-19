@@ -14,7 +14,13 @@ import java.lang.Exception
 class Node(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<Node>(Nodes)
 
+    var graph by Graph referencedOn Nodes.graph
+    val fromEdges by Edge referrersOn Edges.fromNode
+    val toEdges by Edge referrersOn Edges.toNode
+
     var name by Nodes.name
+    var x by Nodes.x
+    var y by Nodes.y
     private var _content by Nodes.content
     var content: ContentJson
         get() {
@@ -33,9 +39,6 @@ class Node(id: EntityID<Int>) : IntEntity(id) {
                 throw Exception("Content json is invalid")
             }
         }
-    var graph by Graph referencedOn Nodes.graph
-    val fromEdges by Edge referrersOn Edges.fromNode
-    val toEdges by Edge referrersOn Edges.toNode
 
     fun toEdgeIds(): List<Int> {
         return toEdges.map { it.id.value }
@@ -47,5 +50,7 @@ fun Node.render() = NodeView(
         graph_id = this.graph.id.value,
         id = this.id.value,
         name = this.name,
-        to_edge_ids = this.toEdgeIds()
+        to_edge_ids = this.toEdgeIds(),
+        x = this.x,
+        y = this.y
 )

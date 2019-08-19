@@ -1,5 +1,6 @@
 package com.example.springkotlingraphexposed.app.controllers
 
+import com.example.springkotlingraphexposed.app.models.ContentJson
 import com.example.springkotlingraphexposed.app.models.Graph
 import com.example.springkotlingraphexposed.app.models.Node
 import com.example.springkotlingraphexposed.app.models.SomeOtherJson
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -43,17 +45,14 @@ class NodesController {
     @PutMapping("/{id}")
     fun update(@PathVariable graphId: Int,
                @PathVariable id: Int,
-               @RequestParam(required = false) name: String,
-               @RequestParam(required = false) type: String): Boolean {
+               @RequestBody nodeRequest: NodeRequest): NodeView {
         return transaction {
             val graph = graph(graphId)
-            val node = graph.nodeById(id)
-            if (node != null) {
-                if (name != null){
-                    node.name = name
-                }
-            }
-            true
+            val node = graph.nodeById(id) ?: throw Exception("Not found")
+            node.name = nodeRequest.name
+            node.x = nodeRequest.x
+            node.y = nodeRequest.y
+            node.render()
         }
     }
 
@@ -61,3 +60,12 @@ class NodesController {
         return Graph.findById(graphId) ?: throw Exception("Not found")
     }
 }
+
+data class NodeRequest(
+        val content: Any,
+        val name: String,
+        val to_edge_ids: List<Int>,
+        val type: String,
+        val x: Float,
+        val y: Float
+)

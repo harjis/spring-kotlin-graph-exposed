@@ -7,4 +7,6 @@ object Nodes : IntIdTable(){
     val name: Column<String> = varchar("name", 50)
     val content: Column<String> = text("content")
     val graph = reference("graph", Graphs)
+    val x: Column<Float> = float("x")
+    val y: Column<Float> = float("y")
 }

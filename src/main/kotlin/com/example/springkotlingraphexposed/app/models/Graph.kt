@@ -12,8 +12,9 @@ import org.jetbrains.exposed.sql.SortOrder
 class Graph(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<Graph>(Graphs)
 
-    var name by Graphs.name
     val nodes by Node referrersOn Nodes.graph
+
+    var name by Graphs.name
 
     fun nodesByInsertOrder(): SizedIterable<Node> {
         return this.nodes.orderBy(Nodes.id to SortOrder.ASC)
