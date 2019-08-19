@@ -2,7 +2,9 @@ package com.example.springkotlingraphexposed.db
 
 import com.example.springkotlingraphexposed.app.models.Edge
 import com.example.springkotlingraphexposed.app.models.Graph
+import com.example.springkotlingraphexposed.app.models.InputType
 import com.example.springkotlingraphexposed.app.models.Node
+import com.example.springkotlingraphexposed.app.models.OutputType
 import com.example.springkotlingraphexposed.app.models.SomeOtherJson
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.context.annotation.Bean
@@ -29,7 +31,8 @@ class Seeds {
 
         val node = transaction {
             Node.new {
-                name = "Node 1"
+                type = InputType
+                name = "InputNode 1"
                 this.graph = graph
                 content = SomeOtherJson()
                 x = 50F
@@ -39,7 +42,8 @@ class Seeds {
 
         val node2 = transaction {
             Node.new {
-                name = "Node 2"
+                type = OutputType
+                name = "OutputNode 1"
                 this.graph = graph
                 content = SomeOtherJson()
                 x = 300F
@@ -62,7 +66,8 @@ class Seeds {
 
         val node21 = transaction {
             Node.new {
-                name = "Node 1"
+                type = InputType
+                name = "InputNode 2"
                 this.graph = graph2
                 content = SomeOtherJson()
                 x = 10F
@@ -72,7 +77,8 @@ class Seeds {
 
         val node22 = transaction {
             Node.new {
-                name = "Node 2"
+                type = OutputType
+                name = "OutputNode 2"
                 this.graph = graph2
                 content = SomeOtherJson()
                 x = 400F

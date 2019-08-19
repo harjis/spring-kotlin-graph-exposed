@@ -33,9 +33,10 @@ class NodesController {
         return transaction {
             val graph = graph(graphId)
             Node.new {
-                this.name = nodeCreateRequest.name
-                this.graph = graph
                 this.content = SomeOtherJson()
+                this.graph = graph
+                this.name = nodeCreateRequest.name
+                this.type = nodeCreateRequest.type
             }.render()
         }
     }

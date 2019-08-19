@@ -8,7 +8,7 @@ data class NodeView(
         val id: Int,
         val name: String,
         val to_edge_ids: List<Int>,
-        val type: String = "InputNode",
+        val type: String,
         val x: Float,
         val y: Float
 )

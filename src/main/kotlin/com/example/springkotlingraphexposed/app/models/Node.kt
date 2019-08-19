@@ -18,6 +18,7 @@ class Node(id: EntityID<Int>) : IntEntity(id) {
     val fromEdges by Edge referrersOn Edges.fromNode
     val toEdges by Edge referrersOn Edges.toNode
 
+    var type by Nodes.type
     var name by Nodes.name
     var x by Nodes.x
     var y by Nodes.y
@@ -51,6 +52,10 @@ fun Node.render() = NodeView(
         id = this.id.value,
         name = this.name,
         to_edge_ids = this.toEdgeIds(),
+        type = this.type,
         x = this.x,
         y = this.y
 )
+
+val OutputType = "OutputNode"
+val InputType = "InputNode"
