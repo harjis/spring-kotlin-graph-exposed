@@ -3,7 +3,6 @@ package com.example.springkotlingraphexposed.app.models
 import com.example.springkotlingraphexposed.app.tables.Graphs
 import com.example.springkotlingraphexposed.app.tables.Nodes
 import com.example.springkotlingraphexposed.app.views.graphs.GraphView
-import com.example.springkotlingraphexposed.app.views.nodes.NodeView
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -30,6 +29,6 @@ class Graph(id: EntityID<Int>) : IntEntity(id) {
 }
 
 fun Graph.render() = GraphView(
-        name = this.name,
-        nodes = this.nodes.map { NodeView(it.name) }
+        id = this.id.value,
+        name = this.name
 )
