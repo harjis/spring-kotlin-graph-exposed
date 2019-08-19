@@ -1,6 +1,5 @@
 package com.example.springkotlingraphexposed.app.controllers
 
-import com.example.springkotlingraphexposed.app.models.ContentJson
 import com.example.springkotlingraphexposed.app.models.Graph
 import com.example.springkotlingraphexposed.app.models.Node
 import com.example.springkotlingraphexposed.app.models.SomeOtherJson
@@ -29,13 +28,12 @@ class NodesController {
 
     @PostMapping("")
     fun create(@PathVariable graphId: Int,
-               @RequestParam name: String,
-               @RequestParam type: String
+               @RequestBody nodeCreateRequest: NodeCreateRequest
     ): NodeView {
         return transaction {
             val graph = graph(graphId)
             Node.new {
-                this.name = name
+                this.name = nodeCreateRequest.name
                 this.graph = graph
                 this.content = SomeOtherJson()
             }.render()
@@ -45,13 +43,13 @@ class NodesController {
     @PutMapping("/{id}")
     fun update(@PathVariable graphId: Int,
                @PathVariable id: Int,
-               @RequestBody nodeRequest: NodeRequest): NodeView {
+               @RequestBody nodeUpdateRequest: NodeUpdateRequest): NodeView {
         return transaction {
             val graph = graph(graphId)
             val node = graph.nodeById(id) ?: throw Exception("Not found")
-            node.name = nodeRequest.name
-            node.x = nodeRequest.x
-            node.y = nodeRequest.y
+            node.name = nodeUpdateRequest.name
+            node.x = nodeUpdateRequest.x
+            node.y = nodeUpdateRequest.y
             node.render()
         }
     }
@@ -61,7 +59,12 @@ class NodesController {
     }
 }
 
-data class NodeRequest(
+data class NodeCreateRequest(
+        val name: String,
+        val type: String
+)
+
+data class NodeUpdateRequest(
         val content: Any,
         val name: String,
         val to_edge_ids: List<Int>,
