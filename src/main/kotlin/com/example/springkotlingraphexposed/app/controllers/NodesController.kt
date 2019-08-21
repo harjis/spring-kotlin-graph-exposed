@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.*
 
 @RestController
 @RequestMapping(path = ["/graphs/{graphId}/nodes"])
 class NodesController {
     @GetMapping("")
-    fun index(@PathVariable graphId: Int): List<NodeView> {
+    fun index(@PathVariable graphId: UUID): List<NodeView> {
         return transaction {
             val graph = graph(graphId)
             graph.nodes.toList().map { it.render() }
@@ -27,7 +27,7 @@ class NodesController {
     }
 
     @PostMapping("")
-    fun create(@PathVariable graphId: Int,
+    fun create(@PathVariable graphId: UUID,
                @RequestBody nodeCreateRequest: NodeCreateRequest
     ): NodeView {
         return transaction {
@@ -42,8 +42,8 @@ class NodesController {
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable graphId: Int,
-               @PathVariable id: Int,
+    fun update(@PathVariable graphId: UUID,
+               @PathVariable id: UUID,
                @RequestBody nodeUpdateRequest: NodeUpdateRequest): NodeView {
         return transaction {
             val graph = graph(graphId)
@@ -55,7 +55,7 @@ class NodesController {
         }
     }
 
-    private fun graph(graphId: Int): Graph {
+    private fun graph(graphId: UUID): Graph {
         return Graph.findById(graphId) ?: throw Exception("Not found")
     }
 }

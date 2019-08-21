@@ -6,14 +6,13 @@ import com.example.springkotlingraphexposed.app.models.Node
 import com.example.springkotlingraphexposed.app.models.SomeOtherJson
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.stereotype.Service
-import java.lang.Exception
 import java.util.*
 
 @Service
 class GraphSaveService {
     fun save(params: GraphParams): Graph {
         return transaction {
-            if (params.id == null) {
+            if (Graph.findById(params.id) == null) {
                 create(params)
             } else {
                 update(params)
@@ -25,114 +24,113 @@ class GraphSaveService {
         val savedGraph = Graph.new {
             name = params.name
         }
-        upsertNodes(params.nodes, savedGraph)
-        // nodeMap needs to be calculated exactly at this position
-        val nodeMap = getNodeMap(params.nodes, savedGraph)
-        saveEdges(params.edges, savedGraph, nodeMap)
+        createNodes(savedGraph, params)
+        createEdges(savedGraph, params)
 
         return savedGraph
     }
 
     private fun update(params: GraphParams): Graph {
-        if (params.id == null) throw Exception("No update without id")
         val graph: Graph = Graph.findById(params.id) ?: throw Exception("No graph found with id: ")
-
         graph.name = params.name
-        upsertNodes(params.nodes, graph)
-        // nodeMap needs to be calculated exactly at this position
-        val nodeMap = getNodeMap(params.nodes, graph)
-        deleteNodes(params.nodes, graph)
-        deleteEdges(params.edges, graph)
-        saveEdges(params.edges, graph, nodeMap)
 
+        val currentNodeIds = graph.nodes.map { it.id.value }
+        val (oldNodes, newNodes) = params.nodes.partition { it.id in currentNodeIds }
+        removeUnused(graph, params)
+        updateOldNodes(graph, oldNodes)
+        addNewNodes(graph, newNodes)
+        addNewEdges(graph, params)
 
         return graph
     }
 
-    private fun upsertNodes(nodes: List<NodeParams>, savedGraph: Graph) {
-        nodes.forEach {
-            val node = if (it.id == null) {
-                Node.new {
-                    name = it.name
-                    graph = savedGraph
-                    content = SomeOtherJson()
-                }
-            } else {
-                val node = savedGraph.nodes.find { node -> node.id.value == it.id }
-                if (node is Node) {
-                    node.name = it.name
-                }
-                node
+    private fun createNodes(graph: Graph, params: GraphParams) {
+        params.nodes.forEach {
+            Node.new(it.id) {
+                content = SomeOtherJson()
+                this.graph = graph
+                name = it.name
+                type = it.type
+                x = it.x
+                y = it.y
             }
-            // NodeParams need to be updated so that primary key's are in sync.
-            it.id = node!!.id.value
         }
     }
 
-    private fun deleteNodes(nodes: List<NodeParams>, savedGraph: Graph) {
-        val persistedNodeIds: List<Int> = savedGraph.nodes.map { it.id.value }
-        val paramsNodeIds: List<Int> = nodes.mapNotNull { it.id }
-        val toBeDeleted: List<Int> = persistedNodeIds.minus(paramsNodeIds)
-        savedGraph.nodes.forEach {
+    private fun createEdges(graph: Graph, params: GraphParams) {
+        params.edges.forEach {
+            val fromNode = graph.nodeById(it.fromNodeId) ?: throw Exception("No graph found with id: ")
+            val toNode = graph.nodeById(it.toNodeId) ?: throw Exception("No graph found with id: ")
+            Edge.new(it.id) {
+                this.fromNode = fromNode
+                this.toNode = toNode
+            }
+        }
+    }
+
+    private fun removeUnused(graph: Graph, params: GraphParams) {
+        val persistedNodeIds = graph.nodes.map { it.id.value }
+        val paramsNodeIds = params.nodes.mapNotNull { it.id }
+        val toBeDeleted = persistedNodeIds.minus(paramsNodeIds)
+        graph.nodes.forEach {
             if (toBeDeleted.contains(it.id.value)) it.delete()
         }
-    }
 
-    private fun saveEdges(edges: List<EdgeParams>, graph: Graph, nodeMap: Map<UUID, Node>) {
-        edges.filter { it.id == null }.forEach {
-            val fromAndToNode = if (it.fromNode is Int && it.toNode is Int) {
-                val fromNode = graph.nodeById(it.fromNode)
-                val toNode = graph.nodeById(it.toNode)
-                Pair(fromNode, toNode)
-            } else if (it.fromNode is UUID && it.toNode is UUID) {
-                val fromNode = nodeMap[it.fromNode]
-                val toNode = nodeMap[it.toNode]
-                Pair(fromNode, toNode)
-            } else if (it.fromNode is UUID && it.toNode is Int) {
-                val fromNode = nodeMap[it.fromNode]
-                val toNode = graph.nodeById(it.toNode)
-                Pair(fromNode, toNode)
-            } else if (it.fromNode is Int && it.toNode is UUID) {
-                val fromNode = graph.nodeById(it.fromNode)
-                val toNode = nodeMap[it.toNode]
-                Pair(fromNode, toNode)
-            } else {
-                throw Exception("Nooo")
-            }
-
-            val (_fromNode, _toNode) = fromAndToNode
-            if (_fromNode is Node && _toNode is Node) {
-                Edge.new {
-                    fromNode = _fromNode
-                    toNode = _toNode
-                }
-            }
-        }
-    }
-
-    private fun deleteEdges(edges: List<EdgeParams>, graph: Graph) {
         graph.uniqueEdges().forEach {
-            println(it.id.toString() + " " + it.fromNode.id + " " + it.toNode.id)
-            val inParams = edges.find { edgeParams -> edgeParams.id == it.id.value }
+            val inParams = params.edges.find { edgeParams -> edgeParams.id == it.id.value }
             if (inParams == null) {
                 it.delete()
             }
         }
     }
 
-    private fun getNodeMap(nodes: List<NodeParams>, graph: Graph): Map<UUID, Node> {
-        return nodes.mapIndexed { index, nodeParams ->
-            nodeParams.clientId to graph.nodes.toList()[index]
-        }.toMap()
+    private fun updateOldNodes(graph: Graph, oldNodes: List<NodeParams>) {
+        oldNodes.forEach {
+            val node = graph.nodeById(it.id) ?: throw Exception("No graph found with id: ")
+            node.apply {
+                content = SomeOtherJson()
+                name = it.name
+                x = it.x
+                y = it.y
+            }
+
+        }
+    }
+
+    private fun addNewNodes(graph: Graph, newNodes: List<NodeParams>) {
+        newNodes.forEach {
+            Node.new(it.id) {
+                content = SomeOtherJson()
+                this.graph = graph
+                name = it.name
+                type = it.type
+                x = it.x
+                y = it.y
+            }
+        }
+    }
+
+    private fun addNewEdges(graph: Graph, params: GraphParams) {
+        val currentEdges = graph.uniqueEdges().map { it.id.value }
+        val newEdges = params.edges.filter { it.id !in currentEdges }
+        val nodeIdToNode = graph.nodes.associateBy { it.id.value }
+        newEdges.forEach { edgeParam ->
+            val fromNode = nodeIdToNode[edgeParam.fromNodeId] ?: throw IllegalStateException("")
+            val toNode = nodeIdToNode[edgeParam.toNodeId] ?: throw IllegalStateException("")
+            Edge.new(edgeParam.id) {
+                this.fromNode = fromNode
+                this.toNode = toNode
+            }
+        }
     }
 }
 
 data class GraphParams(
-        val id: Int? = null,
+        val id: UUID,
         val name: String,
         val nodes: List<NodeParams> = listOf(),
         val edges: List<EdgeParams> = listOf()
 )
 
-data class NodeParams(var id: Int? = null, val name: String, val clientId: UUID)
-data class EdgeParams(val id: Int? = null, val fromNode: Any?, val toNode: Any?)
+data class NodeParams(var id: UUID, val name: String, val type: String, val x: Float, val y: Float)
+data class EdgeParams(val id: UUID, val fromNodeId: UUID, val toNodeId: UUID)

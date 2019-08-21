@@ -7,12 +7,13 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.UUIDEntity
+import org.jetbrains.exposed.dao.UUIDEntityClass
 import java.lang.Exception
+import java.util.*
 
-class Node(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Node>(Nodes)
+class Node(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<Node>(Nodes)
 
     var graph by Graph referencedOn Nodes.graph
     val fromEdges by Edge referrersOn Edges.fromNode
@@ -41,7 +42,7 @@ class Node(id: EntityID<Int>) : IntEntity(id) {
             }
         }
 
-    fun toEdgeIds(): List<Int> {
+    fun toEdgeIds(): List<UUID> {
         return toEdges.map { it.id.value }
     }
 }

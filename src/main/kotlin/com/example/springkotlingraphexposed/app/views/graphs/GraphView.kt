@@ -1,3 +1,5 @@
 package com.example.springkotlingraphexposed.app.views.graphs
 
-data class GraphView(val id: Int, val name: String)
+import java.util.*
+
+data class GraphView(val id: UUID, val name: String)

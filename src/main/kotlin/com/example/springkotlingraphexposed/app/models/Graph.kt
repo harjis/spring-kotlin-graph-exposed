@@ -6,25 +6,24 @@ import com.example.springkotlingraphexposed.app.views.graphs.GraphView
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.UUIDEntity
+import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.sql.SizedIterable
 import org.jetbrains.exposed.sql.SortOrder
+import java.util.*
 
-class Graph(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Graph>(Graphs)
+class Graph(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<Graph>(Graphs)
 
     val nodes by Node referrersOn Nodes.graph
 
     var name by Graphs.name
 
-    fun nodesByInsertOrder(): SizedIterable<Node> {
-        return this.nodes.orderBy(Nodes.id to SortOrder.ASC)
-    }
-
-    fun nodeById(nodeId: Int): Node? {
+    fun nodeById(nodeId: UUID): Node? {
         return this.nodes.find { it.id.value == nodeId }
     }
 
-    fun edgeById(edgeId: Int): Edge? {
+    fun edgeById(edgeId: UUID): Edge? {
         return uniqueEdges().find { it.id.value == edgeId }
     }
 

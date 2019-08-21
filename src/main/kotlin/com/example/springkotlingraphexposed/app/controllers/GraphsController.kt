@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.lang.Exception
+import java.util.*
 
 @RestController
 @RequestMapping(path = ["/graphs"])
@@ -21,7 +22,7 @@ class GraphsController {
     }
 
     @GetMapping("/{id}")
-    fun show(@PathVariable id: Int): GraphView {
+    fun show(@PathVariable id: UUID): GraphView {
         return transaction {
             Graph.findById(id)?.render() ?: throw Exception("Not found")
         }
