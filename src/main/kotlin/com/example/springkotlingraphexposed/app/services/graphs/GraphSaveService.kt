@@ -10,42 +10,42 @@ import java.util.*
 
 @Service
 class GraphSaveService {
-    fun save(params: GraphParams): Graph {
+    fun save(request: GraphRequest): Graph {
         return transaction {
-            if (Graph.findById(params.id) == null) {
-                create(params)
+            if (Graph.findById(request.graph.id) == null) {
+                create(request)
             } else {
-                update(params)
+                update(request)
             }
         }
     }
 
-    private fun create(params: GraphParams): Graph {
+    private fun create(request: GraphRequest): Graph {
         val savedGraph = Graph.new {
-            name = params.name
+            name = request.graph.name
         }
-        createNodes(savedGraph, params)
-        createEdges(savedGraph, params)
+        createNodes(savedGraph, request)
+        createEdges(savedGraph, request)
 
         return savedGraph
     }
 
-    private fun update(params: GraphParams): Graph {
-        val graph: Graph = Graph.findById(params.id) ?: throw Exception("No graph found with id: ")
-        graph.name = params.name
+    private fun update(request: GraphRequest): Graph {
+        val graph: Graph = Graph.findById(request.graph.id) ?: throw Exception("No graph found with id: ")
+        graph.name = request.graph.name
 
         val currentNodeIds = graph.nodes.map { it.id.value }
-        val (oldNodes, newNodes) = params.nodes.partition { it.id in currentNodeIds }
-        removeUnused(graph, params)
+        val (oldNodes, newNodes) = request.nodes.partition { it.id in currentNodeIds }
+        removeUnused(graph, request)
         updateOldNodes(graph, oldNodes)
         addNewNodes(graph, newNodes)
-        addNewEdges(graph, params)
+        addNewEdges(graph, request)
 
         return graph
     }
 
-    private fun createNodes(graph: Graph, params: GraphParams) {
-        params.nodes.forEach {
+    private fun createNodes(graph: Graph, request: GraphRequest) {
+        request.nodes.forEach {
             Node.new(it.id) {
                 content = SomeOtherJson()
                 this.graph = graph
@@ -57,8 +57,8 @@ class GraphSaveService {
         }
     }
 
-    private fun createEdges(graph: Graph, params: GraphParams) {
-        params.edges.forEach {
+    private fun createEdges(graph: Graph, request: GraphRequest) {
+        request.edges.forEach {
             val fromNode = graph.nodeById(it.fromNodeId) ?: throw Exception("No graph found with id: ")
             val toNode = graph.nodeById(it.toNodeId) ?: throw Exception("No graph found with id: ")
             Edge.new(it.id) {
@@ -68,16 +68,16 @@ class GraphSaveService {
         }
     }
 
-    private fun removeUnused(graph: Graph, params: GraphParams) {
+    private fun removeUnused(graph: Graph, request: GraphRequest) {
         val persistedNodeIds = graph.nodes.map { it.id.value }
-        val paramsNodeIds = params.nodes.mapNotNull { it.id }
+        val paramsNodeIds = request.nodes.mapNotNull { it.id }
         val toBeDeleted = persistedNodeIds.minus(paramsNodeIds)
         graph.nodes.forEach {
             if (toBeDeleted.contains(it.id.value)) it.delete()
         }
 
         graph.uniqueEdges().forEach {
-            val inParams = params.edges.find { edgeParams -> edgeParams.id == it.id.value }
+            val inParams = request.edges.find { edgeParams -> edgeParams.id == it.id.value }
             if (inParams == null) {
                 it.delete()
             }
@@ -110,9 +110,9 @@ class GraphSaveService {
         }
     }
 
-    private fun addNewEdges(graph: Graph, params: GraphParams) {
+    private fun addNewEdges(graph: Graph, request: GraphRequest) {
         val currentEdges = graph.uniqueEdges().map { it.id.value }
-        val newEdges = params.edges.filter { it.id !in currentEdges }
+        val newEdges = request.edges.filter { it.id !in currentEdges }
         val nodeIdToNode = graph.nodes.associateBy { it.id.value }
         newEdges.forEach { edgeParam ->
             val fromNode = nodeIdToNode[edgeParam.fromNodeId] ?: throw IllegalStateException("")
@@ -125,12 +125,12 @@ class GraphSaveService {
     }
 }
 
-data class GraphParams(
-        val id: UUID,
-        val name: String,
+data class GraphRequest(
+        val graph: GraphParams,
         val nodes: List<NodeParams> = listOf(),
         val edges: List<EdgeParams> = listOf()
 )
 
-data class NodeParams(var id: UUID, val name: String, val type: String, val x: Float, val y: Float)
+data class GraphParams(val id: UUID, val name: String)
+data class NodeParams(val content: Any? = null, val graphId: Any? = null, val id: UUID, val name: String, val toEdgeIds: Any? = null, val type: String, val x: Float, val y: Float)
 data class EdgeParams(val id: UUID, val fromNodeId: UUID, val toNodeId: UUID)

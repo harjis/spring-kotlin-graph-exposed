@@ -5,6 +5,7 @@ import com.example.springkotlingraphexposed.app.models.Graph
 import com.example.springkotlingraphexposed.app.models.InputType
 import com.example.springkotlingraphexposed.app.services.graphs.EdgeParams
 import com.example.springkotlingraphexposed.app.services.graphs.GraphParams
+import com.example.springkotlingraphexposed.app.services.graphs.GraphRequest
 import com.example.springkotlingraphexposed.app.services.graphs.GraphSaveService
 import com.example.springkotlingraphexposed.app.services.graphs.NodeParams
 import org.assertj.core.api.Assertions.assertThat
@@ -24,10 +25,10 @@ class GraphSaveServiceTest : WithTestDatabase() {
     @Test
     fun canSaveGraph() {
         withDb {
-            val params = GraphParams(id = UUID.randomUUID(), name = "Graph 1")
+            val params = GraphRequest(GraphParams(id = UUID.randomUUID(), name = "Graph 1"))
             val saved = graphSaveService.save(params)
             assertThat(saved.id).isNotNull()
-            assertThat(saved.name).isEqualTo(params.name)
+            assertThat(saved.name).isEqualTo(params.graph.name)
             assertThat(Graph.count()).isEqualTo(1)
         }
     }
@@ -35,11 +36,11 @@ class GraphSaveServiceTest : WithTestDatabase() {
     @Test
     fun canUpdateGraph() {
         withDb {
-            val params = GraphParams(id = UUID.randomUUID(), name = "Graph 1")
+            val params = GraphRequest(GraphParams(id = UUID.randomUUID(), name = "Graph 1"))
             val saved = graphSaveService.save(params)
-            val updatedParams = GraphParams(id = saved.id.value, name = "Updated Graph 1")
+            val updatedParams = GraphRequest(GraphParams(id = saved.id.value, name = "Updated Graph 1"))
             val updated = graphSaveService.save(updatedParams)
-            assertThat(updated.name).isEqualTo(updatedParams.name)
+            assertThat(updated.name).isEqualTo(updatedParams.graph.name)
             assertThat(Graph.count()).isEqualTo(1)
         }
     }
@@ -47,9 +48,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
     @Test
     fun canSaveNodes() {
         withDb {
-            val params = GraphParams(
-                    id = UUID.randomUUID(),
-                    name = "Graph 1",
+            val params = GraphRequest(
+                    graph = GraphParams(id = UUID.randomUUID(), name = "Graph 1"),
                     nodes = listOf(
                             NodeParams(
                                     id = UUID.randomUUID(),
@@ -68,9 +68,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
     @Test
     fun canUpdateNodes() {
         withDb {
-            val params = GraphParams(
-                    id = UUID.randomUUID(),
-                    name = "Graph 1",
+            val params = GraphRequest(
+                    graph = GraphParams(id = UUID.randomUUID(), name = "Graph 1"),
                     nodes = listOf(
                             NodeParams(
                                     id = UUID.randomUUID(),
@@ -82,9 +81,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
                     )
             )
             val saved = graphSaveService.save(params)
-            val updateParams = GraphParams(
-                    id = saved.id.value,
-                    name = saved.name,
+            val updateParams = GraphRequest(
+                    graph = GraphParams(id = saved.id.value, name = saved.name),
                     nodes = listOf(
                             NodeParams(
                                     id = saved.nodes.first().id.value,
@@ -104,9 +102,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
     @Test
     fun canDeleteNodes() {
         withDb {
-            val params = GraphParams(
-                    id = UUID.randomUUID(),
-                    name = "Graph 1",
+            val params = GraphRequest(
+                    graph = GraphParams(id = UUID.randomUUID(), name = "Graph 1"),
                     nodes = listOf(
                             NodeParams(
                                     id = UUID.randomUUID(),
@@ -125,9 +122,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
                     )
             )
             val saved = graphSaveService.save(params)
-            val updateParams = GraphParams(
-                    id = saved.id.value,
-                    name = saved.name,
+            val updateParams = GraphRequest(
+                    graph = GraphParams(id = saved.id.value, name = saved.name),
                     nodes = listOf(
                             NodeParams(
                                     id = saved.nodes.first().id.value,
@@ -147,9 +143,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
     @Test
     fun canAddAndUpdateNodes() {
         withDb {
-            val params = GraphParams(
-                    id = UUID.randomUUID(),
-                    name = "Graph1",
+            val params = GraphRequest(
+                    graph = GraphParams(id = UUID.randomUUID(), name = "Graph1"),
                     nodes = listOf(
                             NodeParams(
                                     id = UUID.randomUUID(),
@@ -168,9 +163,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
                     )
             )
             val saved = graphSaveService.save(params)
-            val updatedParams = GraphParams(
-                    id = saved.id.value,
-                    name = "Updated " + saved.name,
+            val updatedParams = GraphRequest(
+                    graph = GraphParams(id = saved.id.value, name = "Updated " + saved.name),
                     nodes = saved.nodes.mapIndexed { index, node ->
                         NodeParams(
                                 id = node.id.value,
@@ -205,9 +199,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
         withDb {
             val nodeId = UUID.randomUUID()
             val nodeId2 = UUID.randomUUID()
-            val params = GraphParams(
-                    id = UUID.randomUUID(),
-                    name = "Graph 1",
+            val params = GraphRequest(
+                    graph = GraphParams(id = UUID.randomUUID(), name = "Graph 1"),
                     nodes = listOf(
                             NodeParams(
                                     id = nodeId,
@@ -240,9 +233,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
                 val nodeId = UUID.randomUUID()
                 val nodeId2 = UUID.randomUUID()
                 val edge = EdgeParams(id = UUID.randomUUID(), fromNodeId = nodeId, toNodeId = nodeId2)
-                val params = GraphParams(
-                        id = UUID.randomUUID(),
-                        name = "Graph 1",
+                val params = GraphRequest(
+                        graph = GraphParams(id = UUID.randomUUID(), name = "Graph 1"),
                         nodes = listOf(
                                 NodeParams(
                                         id = nodeId,
@@ -262,9 +254,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
                         edges = listOf(edge)
                 )
                 val saved = graphSaveService.save(params)
-                val updateParams = GraphParams(
-                        id = saved.id.value,
-                        name = "Graph 1",
+                val updateParams = GraphRequest(
+                        graph = GraphParams(id = saved.id.value, name = "Graph 1"),
                         nodes = listOf(
                                 NodeParams(
                                         id = nodeId,
@@ -300,9 +291,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
         withDb {
             val nodeId = UUID.randomUUID()
             val nodeId2 = UUID.randomUUID()
-            val params = GraphParams(
-                    id = UUID.randomUUID(),
-                    name = "Graph 1",
+            val params = GraphRequest(
+                    graph = GraphParams(id = UUID.randomUUID(), name = "Graph 1"),
                     nodes = listOf(
                             NodeParams(
                                     id = nodeId,
@@ -324,9 +314,8 @@ class GraphSaveServiceTest : WithTestDatabase() {
                     )
             )
             val saved = graphSaveService.save(params)
-            val updateParams = GraphParams(
-                    id = saved.id.value,
-                    name = "Graph 1",
+            val updateParams = GraphRequest(
+                    graph = GraphParams(id = saved.id.value, name = "Graph 1"),
                     nodes = listOf(
                             NodeParams(
                                     id = nodeId,
