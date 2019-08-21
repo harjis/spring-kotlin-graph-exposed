@@ -45,6 +45,10 @@ class Node(id: EntityID<UUID>) : UUIDEntity(id) {
     fun toEdgeIds(): List<UUID> {
         return toEdges.map { it.id.value }
     }
+
+    fun ancestors(): List<Node> {
+        return this.toEdges.map { it.fromNode }
+    }
 }
 
 fun Node.render() = NodeView(

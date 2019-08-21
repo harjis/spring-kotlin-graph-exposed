@@ -37,4 +37,17 @@ class GraphsController(private val graphSaveService: GraphSaveService) {
         graphSaveService.save(request)
         return true
     }
+
+    @GetMapping("/{id}/tree")
+    fun tree(@PathVariable id: UUID) {
+        transaction {
+            val graph = Graph.findById(id) ?: throw Exception("Not found")
+            val root = graph.rootNode()
+            println(root.name)
+            val ancestors = root.ancestors()
+            ancestors.forEach {
+                println(it.name)
+            }
+        }
+    }
 }

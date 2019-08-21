@@ -4,12 +4,8 @@ import com.example.springkotlingraphexposed.app.tables.Graphs
 import com.example.springkotlingraphexposed.app.tables.Nodes
 import com.example.springkotlingraphexposed.app.views.graphs.GraphView
 import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
-import org.jetbrains.exposed.sql.SizedIterable
-import org.jetbrains.exposed.sql.SortOrder
 import java.util.*
 
 class Graph(id: EntityID<UUID>) : UUIDEntity(id) {
@@ -29,6 +25,10 @@ class Graph(id: EntityID<UUID>) : UUIDEntity(id) {
 
     fun uniqueEdges(): List<Edge> {
         return this.nodes.flatMap { it.fromEdges.union(it.toEdges) }.distinctBy { it.id }
+    }
+
+    fun rootNode(): Node {
+        return this.nodes.find { it.type == "OutputNode" } ?: throw Exception("Noo!")
     }
 }
 
