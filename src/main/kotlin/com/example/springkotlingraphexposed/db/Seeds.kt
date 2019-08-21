@@ -4,6 +4,7 @@ import com.example.springkotlingraphexposed.app.models.Edge
 import com.example.springkotlingraphexposed.app.models.Graph
 import com.example.springkotlingraphexposed.app.models.InputType
 import com.example.springkotlingraphexposed.app.models.Node
+import com.example.springkotlingraphexposed.app.models.NodeRefNode
 import com.example.springkotlingraphexposed.app.models.OutputType
 import com.example.springkotlingraphexposed.app.models.SomeOtherJson
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -90,6 +91,25 @@ class Seeds {
             Edge.new {
                 fromNode = node21
                 toNode = node22
+            }
+        }
+
+        val nodeRef = transaction {
+            Node.new {
+                type = NodeRefNode
+                name = "Node reference node"
+                this.graph = graph
+                this.nodeRef = node22
+                content = SomeOtherJson()
+                x = 400F
+                y = 200F
+            }
+        }
+
+        transaction {
+            Edge.new {
+                fromNode = nodeRef
+                toNode = node2
             }
         }
     }

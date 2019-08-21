@@ -15,6 +15,7 @@ import java.util.*
 class Node(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<Node>(Nodes)
 
+    var nodeRef by Node optionalReferencedOn Nodes.nodeRef
     var graph by Graph referencedOn Nodes.graph
     val fromEdges by Edge referrersOn Edges.fromNode
     val toEdges by Edge referrersOn Edges.toNode
@@ -64,3 +65,4 @@ fun Node.render() = NodeView(
 
 val OutputType = "OutputNode"
 val InputType = "InputNode"
+val NodeRefNode = "NodeRefNode"
