@@ -4,10 +4,10 @@ import com.example.springkotlingraphexposed.app.models.ContentJson
 
 data class NodeView(
         val content: ContentJson,
-        val graph_id: Int,
+        val graphId: Int,
         val id: Int,
         val name: String,
-        val to_edge_ids: List<Int>,
+        val toEdgeIds: List<Int>,
         val type: String,
         val x: Float,
         val y: Float

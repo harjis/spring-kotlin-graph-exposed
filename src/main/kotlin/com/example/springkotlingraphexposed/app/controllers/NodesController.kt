@@ -68,7 +68,7 @@ data class NodeCreateRequest(
 data class NodeUpdateRequest(
         val content: Any,
         val name: String,
-        val to_edge_ids: List<Int>,
+        val toEdgeIds: List<Int>,
         val type: String,
         val x: Float,
         val y: Float

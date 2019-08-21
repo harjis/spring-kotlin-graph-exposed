@@ -48,10 +48,10 @@ class Node(id: EntityID<Int>) : IntEntity(id) {
 
 fun Node.render() = NodeView(
         content = this.content,
-        graph_id = this.graph.id.value,
+        graphId = this.graph.id.value,
         id = this.id.value,
         name = this.name,
-        to_edge_ids = this.toEdgeIds(),
+        toEdgeIds = this.toEdgeIds(),
         type = this.type,
         x = this.x,
         y = this.y

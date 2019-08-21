@@ -28,8 +28,8 @@ class EdgesController {
     @PostMapping("")
     fun create(@RequestBody edgeCreateRequest: EdgeCreateRequest): EdgeView {
         return transaction {
-            val fromNode = Node.findById(edgeCreateRequest.from_node_id) ?: throw Exception("Not found")
-            val toNode = Node.findById(edgeCreateRequest.to_node_id) ?: throw Exception("Not found")
+            val fromNode = Node.findById(edgeCreateRequest.fromNodeId) ?: throw Exception("Not found")
+            val toNode = Node.findById(edgeCreateRequest.toNodeId) ?: throw Exception("Not found")
             Edge.new {
                 this.fromNode = fromNode
                 this.toNode = toNode
@@ -50,4 +50,4 @@ class EdgesController {
     }
 }
 
-data class EdgeCreateRequest(val from_node_id: Int, val to_node_id: Int)
+data class EdgeCreateRequest(val fromNodeId: Int, val toNodeId: Int)

@@ -15,6 +15,6 @@ class Edge(id: EntityID<Int>) : IntEntity(id) {
 
 fun Edge.render() = EdgeView(
         id = this.id.value,
-        from_node_id = this.fromNode.id.value,
-        to_node_id = this.toNode.id.value
+        fromNodeId = this.fromNode.id.value,
+        toNodeId = this.toNode.id.value
 )
