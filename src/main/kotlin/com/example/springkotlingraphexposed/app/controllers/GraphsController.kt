@@ -1,10 +1,10 @@
 package com.example.springkotlingraphexposed.app.controllers
 
 import com.example.springkotlingraphexposed.app.models.Graph
-import com.example.springkotlingraphexposed.app.views.graphs.GraphView
 import com.example.springkotlingraphexposed.app.models.render
 import com.example.springkotlingraphexposed.app.services.graphs.GraphRequest
 import com.example.springkotlingraphexposed.app.services.graphs.GraphSaveService
+import com.example.springkotlingraphexposed.app.views.graphs.GraphView
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -12,11 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.lang.Exception
 import java.util.*
 
 @RestController
-@RequestMapping(path = ["/graphs"])
+@RequestMapping(path = ["api/graphs"])
 class GraphsController(private val graphSaveService: GraphSaveService) {
     @GetMapping("")
     fun index(): List<GraphView> {

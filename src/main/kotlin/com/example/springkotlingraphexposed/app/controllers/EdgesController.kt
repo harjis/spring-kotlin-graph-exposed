@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
-@RequestMapping(path = ["/graphs/{graphId}/edges"])
+@RequestMapping(path = ["api/graphs/{graphId}/edges"])
 class EdgesController {
     @GetMapping("")
     fun index(@PathVariable graphId: UUID): List<EdgeView> {

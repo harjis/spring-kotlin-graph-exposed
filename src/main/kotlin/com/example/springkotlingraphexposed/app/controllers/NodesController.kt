@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
-@RequestMapping(path = ["/graphs/{graphId}/nodes"])
+@RequestMapping(path = ["api/graphs/{graphId}/nodes"])
 class NodesController {
     @GetMapping("")
     fun index(@PathVariable graphId: UUID): List<NodeView> {
