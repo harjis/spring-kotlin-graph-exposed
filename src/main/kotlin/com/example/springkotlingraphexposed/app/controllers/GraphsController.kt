@@ -4,7 +4,11 @@ import com.example.springkotlingraphexposed.app.models.Graph
 import com.example.springkotlingraphexposed.app.models.render
 import com.example.springkotlingraphexposed.app.services.graphs.GraphRequest
 import com.example.springkotlingraphexposed.app.services.graphs.GraphSaveService
+import com.example.springkotlingraphexposed.app.services.nodes.EagerLoader
+import com.example.springkotlingraphexposed.app.services.nodes.NodeParams
 import com.example.springkotlingraphexposed.app.views.graphs.GraphView
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -38,15 +42,10 @@ class GraphsController(private val graphSaveService: GraphSaveService) {
     }
 
     @GetMapping("/{id}/tree")
-    fun tree(@PathVariable id: UUID) {
-        transaction {
-            val graph = Graph.findById(id) ?: throw Exception("Not found")
-            val root = graph.rootNode()
-            println(root.name)
-            val ancestors = root.ancestors()
-            ancestors.forEach {
-                println(it.name)
-            }
+    fun tree(@PathVariable id: UUID): NodeParams {
+        return transaction {
+            addLogger(StdOutSqlLogger)
+            EagerLoader().eagerLoad(id)
         }
     }
 }

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
-import java.lang.Exception
 import java.util.*
 
 class Node(id: EntityID<UUID>) : UUIDEntity(id) {
@@ -48,7 +47,13 @@ class Node(id: EntityID<UUID>) : UUIDEntity(id) {
     }
 
     fun ancestors(): List<Node> {
-        return this.toEdges.map { it.fromNode }
+        return this.toEdges.map {
+            if (it.fromNode.type == "NodeRefNode") {
+                it.fromNode.nodeRef ?: throw Exception("Wat")
+            } else {
+                it.fromNode
+            }
+        }
     }
 }
 
