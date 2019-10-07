@@ -1,37 +1,49 @@
 package com.example.springkotlingraphexposed.controllers
 
 import com.example.springkotlingraphexposed.WithTestDatabase
+import com.example.springkotlingraphexposed.app.controllers.GraphsController
 import com.example.springkotlingraphexposed.app.models.Graph
-import com.example.springkotlingraphexposed.app.views.graphs.GraphView
+import com.example.springkotlingraphexposed.app.models.render
+import com.example.springkotlingraphexposed.app.services.graphs.GraphSaveService
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.client.getForEntity
-import org.springframework.http.HttpStatus
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@WebMvcTest(controllers = [GraphsController::class])
 class GraphControllerTest : WithTestDatabase() {
     @Autowired
-    private lateinit var testRestTemplate: TestRestTemplate
+    private lateinit var mockMvc: MockMvc
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
+
+    @MockBean
+    private lateinit var graphSaveService: GraphSaveService
 
     private val url = "/api/graphs"
 
     @Test
     fun respondsToIndexAction() {
         withDb {
-            Graph.new {
-                name = "Test Graph"
+            val graph = Graph.new {
+                name = "Test"
             }
-            println(Graph.count())
-            val response = testRestTemplate.getForEntity<List<GraphView>>(url)
-            Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-            println(response.body)
+            val result = mockMvc
+                    .perform(MockMvcRequestBuilders.get(url))
+                    .andExpect(MockMvcResultMatchers.status().isOk)
+                    .andReturn()
+
+            val expected = objectMapper.writeValueAsString(listOf(graph.render()))
+            Assertions.assertThat(result.response.contentAsString).isEqualTo(expected)
         }
     }
 }
