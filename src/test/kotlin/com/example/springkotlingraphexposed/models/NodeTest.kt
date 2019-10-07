@@ -26,6 +26,7 @@ class NodeTest : WithTestDatabase() {
             }
             val node = transaction {
                 Node.new {
+                    type = InputType
                     graph = graph1
                     name = "Node 1"
                     content = content1
@@ -46,6 +47,7 @@ class NodeTest : WithTestDatabase() {
                 }
                 val node = transaction {
                     Node.new {
+                        type = InputType
                         graph = graph1
                         name = "Node 1"
                         content = content1
