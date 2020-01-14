@@ -6,9 +6,9 @@ import com.example.springkotlingraphexposed.app.views.nodes.NodeView
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
 import java.util.*
 
 class Node(id: EntityID<UUID>) : UUIDEntity(id) {

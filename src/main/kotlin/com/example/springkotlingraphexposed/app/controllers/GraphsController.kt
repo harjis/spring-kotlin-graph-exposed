@@ -23,9 +23,7 @@ import java.util.*
 class GraphsController(private val graphSaveService: GraphSaveService) {
     @GetMapping("")
     fun index(): List<GraphView> {
-        return transaction {
-            Graph.all().toList().map { it.render() }
-        }
+        return Graph.all().toList().map { it.render() }
     }
 
     @GetMapping("/{id}")

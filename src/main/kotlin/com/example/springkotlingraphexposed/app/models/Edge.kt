@@ -2,9 +2,9 @@ package com.example.springkotlingraphexposed.app.models
 
 import com.example.springkotlingraphexposed.app.tables.Edges
 import com.example.springkotlingraphexposed.app.views.edges.EdgeView
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
 import java.util.*
 
 class Edge(id: EntityID<UUID>) : UUIDEntity(id) {

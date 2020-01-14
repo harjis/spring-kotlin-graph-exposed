@@ -16,6 +16,7 @@ repositories {
     maven {
         url = uri("https://dl.bintray.com/kotlin/exposed")
     }
+	jcenter()
 }
 
 dependencies {
@@ -30,7 +31,9 @@ dependencies {
 	}
 	testImplementation("org.junit.jupiter:junit-jupiter-api")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-	implementation("org.jetbrains.exposed:exposed:0.13.7")
+	implementation("org.jetbrains.exposed", "exposed-core", "0.20.1")
+	implementation("org.jetbrains.exposed", "exposed-dao", "0.20.1")
+	implementation("org.jetbrains.exposed", "exposed-jdbc", "0.20.1")
 }
 
 tasks.withType<KotlinCompile> {

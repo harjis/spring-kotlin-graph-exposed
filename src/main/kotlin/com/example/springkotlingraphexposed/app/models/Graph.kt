@@ -3,9 +3,9 @@ package com.example.springkotlingraphexposed.app.models
 import com.example.springkotlingraphexposed.app.tables.Graphs
 import com.example.springkotlingraphexposed.app.tables.Nodes
 import com.example.springkotlingraphexposed.app.views.graphs.GraphView
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
 import java.util.*
 
 class Graph(id: EntityID<UUID>) : UUIDEntity(id) {
